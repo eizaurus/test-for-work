@@ -1,7 +1,8 @@
 import Image from 'next/image';
 import styles from './page.module.css';
 import { DarkModeButton } from '@/redux';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import Todos from './todos';
 
 export default function Home() {
 	return (
@@ -14,13 +15,16 @@ export default function Home() {
 				bgcolor: 'background.default',
 				color: 'text.primary',
 			}}
+			className={styles.main}
 		>
-			<DarkModeButton
+			{/* <DarkModeButton
 				style={{ position: 'absolute', top: 8, right: 8 }}
-			/>
-			<main className={styles.main}>
-				<div className={styles.center}></div>
-			</main>
+			/> */}
+			<Typography variant='h2' component='h2'>
+				todos
+				<DarkModeButton />
+			</Typography>
+			<Todos />
 		</Box>
 	);
 }

@@ -5,7 +5,7 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { useDispatch } from 'react-redux';
 import { action, selector, AppS } from './redux';
 
-const DarkModeButton = ({ style }: { style: object }) => {
+const DarkModeButton = () => {
 	const dispatch = useDispatch();
 	let Icon = <Brightness7Icon />;
 	const theme = AppS(selector.theme);
@@ -18,7 +18,6 @@ const DarkModeButton = ({ style }: { style: object }) => {
 		margin: 'auto',
 		bgcolor: 'inherit',
 		color: 'inherit',
-		...style,
 	};
 
 	return (

@@ -1,14 +1,29 @@
 import { PaletteMode } from '@mui/material';
 
+type task = {
+	text: string;
+	complete: boolean;
+};
+export type taskList = {
+	[key: number]: task;
+};
 type state = {
 	todo: {
 		theme: PaletteMode;
+		task: taskList;
 	};
 };
 
 const darkmode = 'todo/darkmode';
-const action = { theme: () => ({ type: darkmode, payload: '' }) };
-const selector = { theme: (state: state) => state.todo.theme };
+const task_add = 'todo/task_add';
+const action = {
+	theme: () => ({ type: darkmode, payload: '' }),
+	task_add: (v: taskList): any => ({ type: task_add, payload: v }),
+};
+const selector = {
+	theme: (state: state) => state.todo.theme,
+	task: (state: state) => state.todo.task,
+};
 
 const isBrowser = typeof window !== `undefined`;
 const LocalStorage = {
@@ -32,6 +47,7 @@ const LocalStorage = {
 function todoReducer(
 	state: state['todo'] = {
 		theme: LocalStorage.isset('theme') || 'light',
+		task: LocalStorage.isset('task') || [],
 	},
 	action: any
 ) {
@@ -44,7 +60,17 @@ function todoReducer(
 				...state,
 				theme: d,
 			};
-
+		case task_add:
+			let a = state.task;
+			a[Object.keys(a).length] = {
+				text: action.payload,
+				complete: false,
+			};
+			LocalStorage.Change('task', JSON.stringify(a));
+			return {
+				...state,
+				task: a,
+			};
 		default: {
 			return state;
 		}
