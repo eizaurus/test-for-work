@@ -31,33 +31,21 @@ import { taskList } from '@/redux/components/reduce';
 
 export default function Todos() {
 	const d = AppD();
-	const [checked, setChecked] = React.useState([0]);
 	const [task, setTask] = React.useState('');
 	const [choice, setChoice] = React.useState('All');
 
 	const taskList: taskList = AppS(selector.task);
-
+	console.log('taskList', taskList);
 	const addTask = () => {
 		if (task.length > 0) {
-			d(action.task_add( task));
+			d(action.task_add(task));
 		}
 	};
-	const handleToggle = (value: number) => () => {
-		const currentIndex = checked.indexOf(value);
-		const newChecked = [...checked];
-
-		if (currentIndex === -1) {
-			newChecked.push(value);
-		} else {
-			newChecked.splice(currentIndex, 1);
-		}
-
-		setChecked(newChecked);
-	};
+	const changeTaskComplete = () => {};
 
 	return (
-		<Card sx={{ width: 600 }}>
-			<CardContent>
+		<Card sx={{ maxWidth: 600, maxHeight: '80vh' }}>
+			<CardContent sx={{ scroll: 'auto' }}>
 				<List
 					dense={true}
 					sx={{
@@ -108,9 +96,10 @@ export default function Todos() {
 					</ListItem>
 
 					{Object.keys(taskList).length > 0 ? (
-						[0, 1, 2, 3].map((index, value) => {
-							const labelId = `checkbox-list-label-${value}`;
-
+						Object.keys(taskList).map((v, index) => {
+							const labelId = `checkbox-list-label-${index}`;
+							console.log('Object.keys(taskList)', v);
+							let i = Number(v);
 							return (
 								<>
 									{index > 0 && (
@@ -119,19 +108,13 @@ export default function Todos() {
 											component='li'
 										/>
 									)}
-									<ListItem key={value} disablePadding>
-										<ListItemButton
-											role={undefined}
-											onClick={handleToggle(value)}
-											dense
-										>
+									<ListItem key={index} disablePadding>
+										<ListItemButton role={undefined} dense>
 											<ListItemIcon>
 												<Checkbox
 													edge='start'
 													checked={
-														checked.indexOf(
-															value
-														) !== -1
+														taskList[i].complete
 													}
 													color='secondary'
 													tabIndex={-1}
@@ -145,16 +128,12 @@ export default function Todos() {
 											<ListItemText
 												id={labelId}
 												sx={{
-													textDecoration:
-														checked.indexOf(
-															value
-														) !== -1
-															? 'line-through'
-															: 'none',
+													textDecoration: taskList[i]
+														.complete
+														? 'line-through'
+														: 'none',
 												}}
-												primary={`Line item ${
-													value + 1
-												}`}
+												primary={taskList[i].text}
 											/>
 										</ListItemButton>
 									</ListItem>
@@ -162,7 +141,7 @@ export default function Todos() {
 							);
 						})
 					) : (
-						<ListItem key='outlined-add-task' disablePadding>
+						<ListItem key='no-task' disablePadding>
 							<Typography variant='caption' component='span'>
 								no task!
 							</Typography>

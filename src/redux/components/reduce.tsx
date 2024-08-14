@@ -18,7 +18,7 @@ const darkmode = 'todo/darkmode';
 const task_add = 'todo/task_add';
 const action = {
 	theme: () => ({ type: darkmode, payload: '' }),
-	task_add: (v: taskList): any => ({ type: task_add, payload: v }),
+	task_add: (v: string): any => ({ type: task_add, payload: v }),
 };
 const selector = {
 	theme: (state: state) => state.todo.theme,
@@ -47,7 +47,9 @@ const LocalStorage = {
 function todoReducer(
 	state: state['todo'] = {
 		theme: LocalStorage.isset('theme') || 'light',
-		task: LocalStorage.isset('task') || [],
+		task: LocalStorage.isset('task')
+			? JSON.parse(LocalStorage.isset('task'))
+			: [],
 	},
 	action: any
 ) {
@@ -61,7 +63,7 @@ function todoReducer(
 				theme: d,
 			};
 		case task_add:
-			let a = state.task;
+			let a = Object.assign({}, state.task);
 			a[Object.keys(a).length] = {
 				text: action.payload,
 				complete: false,
