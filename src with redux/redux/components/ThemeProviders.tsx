@@ -3,7 +3,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { createTheme } from '@mui/material/styles';
 import { PaletteMode } from '@mui/material';
 import { useSelector } from 'react-redux';
-import { AppS, selector, Providers } from '@/redux';
+import { AppS, selector, Providers } from '..';
 import React from 'react';
 
 export default function ThemeProviders({

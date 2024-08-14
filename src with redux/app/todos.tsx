@@ -17,51 +17,34 @@ import { Box } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import AddTaskIcon from '@mui/icons-material/AddTask';
-
-type task = {
-	text: string;
-	complete: boolean;
-};
-type taskList = {
-	[key: number]: task;
-};
-type visible = 'All' | 'Active' | 'Completed';
+import { action, AppD, AppS, selector } from '../redux';
+import { taskList, visible } from '../redux/components/reduce';
 
 export default function Todos() {
-	const [task, setTask] = React.useState<string>('');
-	const [choice, setVisible] = React.useState<visible>('All');
-	const [currentCount, setCount] = React.useState<number>(0);
-	const [taskList, setTaskList] = React.useState<taskList>({});
-
+	const d = AppD();
+	const [task, setTask] = React.useState('');
+	const choice: visible = AppS(selector.visible);
+	const [currentCount, setCount] = React.useState(0);
+	const taskList: taskList = AppS(selector.task);
 	const addTask = () => {
 		if (task.length > 0) {
-			let newTaskList: taskList = Object.assign({}, taskList);
-			newTaskList[Object.keys(newTaskList).length] = {
-				text: task,
-				complete: false,
-			};
-			setTask('');
-			setTaskList(newTaskList);
+			d(action.task_add(task));
 		}
 	};
 	const changeTaskComplete = (id: number) => () => {
-		let newTaskList: taskList = Object.assign({}, taskList);
-		newTaskList[id].complete = !newTaskList[id].complete;
-		setTaskList(newTaskList);
+		const ids = String(id);
+		d(action.task_change(ids));
+	};
+	const changeVisible = (v: visible) => {
+		d(action.visible_change(v));
 	};
 	const clearCompleted = () => {
-		let c: taskList = Object.assign({}, taskList);
-		let newTaskList: taskList = {};
-		Object.keys(c).map((i) => {
-			if (!c[Number(i)].complete)
-				newTaskList[Object.keys(newTaskList).length] = c[Number(i)];
-		});
-		setTaskList(newTaskList);
+		d(action.clearCompleted());
 	};
 	React.useEffect(() => {
 		if (Object.keys(taskList).length > 0) {
 			let i = 0;
-			Object.keys(taskList).map((v) => {
+			Object.keys(taskList).map((v, index) => {
 				let complete = taskList[Number(v)].complete;
 				if (
 					choice == 'All' ||
@@ -70,6 +53,7 @@ export default function Todos() {
 				)
 					i++;
 			});
+			console.log('i', i);
 			setCount(i);
 		}
 	}, [taskList, choice]);
@@ -78,7 +62,6 @@ export default function Todos() {
 		<Card sx={{ maxWidth: 600, maxHeight: '80vh' }}>
 			<CardContent sx={{ scroll: 'auto' }}>
 				<List
-					key={'list'}
 					dense={true}
 					sx={{
 						py: 0,
@@ -87,7 +70,7 @@ export default function Todos() {
 						backgroundColor: 'background.paper',
 					}}
 				>
-					<ListItem /* key={0}  */ disablePadding>
+					<ListItem key='outlined-add-task' disablePadding>
 						<Box
 							sx={{
 								display: 'flex',
@@ -98,7 +81,6 @@ export default function Todos() {
 							}}
 						>
 							<TextField
-								role='InputTask'
 								id='input-with-sx'
 								label='add new task'
 								variant='standard'
@@ -111,7 +93,6 @@ export default function Todos() {
 								InputProps={{
 									endAdornment: (
 										<InputAdornment
-											role='AddNewTask'
 											position='end'
 											onClick={() => addTask()}
 										>
@@ -141,22 +122,13 @@ export default function Todos() {
 							)
 								return (
 									<>
-										{/* {index > 0 && (
+										{index > 0 && (
 											<Divider
-												key={index * 2}
 												variant='middle'
 												component='li'
-												ComponentProps={{
-													key: index * 2,
-												}}
 											/>
-										)} */}
-										
-										<ListItem
-											key={index * 2 + 1}
-											disablePadding
-											role={`task-${index}`}
-										>
+										)}
+										<ListItem key={index} disablePadding>
 											<ListItemButton
 												role={undefined}
 												dense
@@ -166,7 +138,6 @@ export default function Todos() {
 											>
 												<ListItemIcon>
 													<Checkbox
-														role={`checkbox-task-${index}`}
 														edge='start'
 														checked={
 															taskList[i].complete
@@ -196,12 +167,8 @@ export default function Todos() {
 								);
 						})
 					) : (
-						<ListItem
-							/* key={1} */
-							disablePadding
-							sx={{ marginLeft: '16px' }}
-						>
-							<Typography variant='h6' component='p'>
+						<ListItem key='no-task' disablePadding>
+							<Typography variant='caption' component='span'>
 								no task!
 							</Typography>
 						</ListItem>
@@ -214,33 +181,30 @@ export default function Todos() {
 				</Typography>
 				<Box>
 					<Button
-						role='AllTask'
 						size='small'
 						color='secondary'
 						variant={choice == 'All' ? 'outlined' : 'text'}
-						onClick={() => setVisible('All')}
+						onClick={() => changeVisible('All')}
 					>
 						<Typography variant='caption' component='span'>
 							All
 						</Typography>
 					</Button>
 					<Button
-						role='ActiveTask'
 						size='small'
 						color='secondary'
 						variant={choice == 'Active' ? 'outlined' : 'text'}
-						onClick={() => setVisible('Active')}
+						onClick={() => changeVisible('Active')}
 					>
 						<Typography variant='caption' component='span'>
 							Active
 						</Typography>
 					</Button>
 					<Button
-						role='CompletedTask'
 						size='small'
 						color='secondary'
 						variant={choice == 'Completed' ? 'outlined' : 'text'}
-						onClick={() => setVisible('Completed')}
+						onClick={() => changeVisible('Completed')}
 					>
 						<Typography variant='caption' component='span'>
 							Completed
@@ -248,7 +212,6 @@ export default function Todos() {
 					</Button>
 				</Box>
 				<Button
-					role='ClearCompletedTask'
 					size='small'
 					color='secondary'
 					onClick={() => clearCompleted()}
