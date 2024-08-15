@@ -3,7 +3,9 @@
  */
 import { render, screen, fireEvent } from '@testing-library/react';
 import Home from './page';
-import userEvent from '@testing-library/user-event';
+/* 
+Не уверен, что правильно покрыл ключевой функционал тестами, и правильно ли вообще их написал.
+*/
 
 it('Add New Task ', () => {
 	render(<Home />);
