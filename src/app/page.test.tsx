@@ -16,6 +16,7 @@ it('Add New Task ', () => {
 	fireEvent.click(screen.getByRole('AddNewTask'));
 	expect(screen.getByRole('task-0')).toHaveTextContent('some text');
 });
+
 it('Complete Second Task ', () => {
 	const { rerender } = render(<Home />);
 
@@ -25,7 +26,7 @@ it('Complete Second Task ', () => {
 	fireEvent.change(field, { target: { value: 'task-0' } });
 	expect(field.value).toBe('task-0');
 	fireEvent.click(screen.getByRole('AddNewTask'));
-	
+
 	fireEvent.change(field, { target: { value: 'task-1' } });
 	expect(field.value).toBe('task-1');
 	fireEvent.click(screen.getByRole('AddNewTask'));
@@ -34,5 +35,27 @@ it('Complete Second Task ', () => {
 	fireEvent.click(screen.getByRole('checkbox-task-0'));
 	fireEvent.click(screen.getByRole('CompletedTask'));
 	expect(screen.getByRole('task-0')).toHaveTextContent('task-0');
-  
+});
+it('Clear Completed Task ', () => {
+	const { rerender } = render(<Home />);
+
+	const field = screen.getByRole('InputTask').querySelector('input');
+	expect(field).toBeInTheDocument();
+
+	fireEvent.change(field, { target: { value: 'task-0' } });
+	expect(field.value).toBe('task-0');
+	fireEvent.click(screen.getByRole('AddNewTask'));
+
+	fireEvent.change(field, { target: { value: 'task-1' } });
+	expect(field.value).toBe('task-1');
+	fireEvent.click(screen.getByRole('AddNewTask'));
+	expect(screen.getByRole('task-0')).toHaveTextContent('task-0');
+	expect(screen.getByRole('task-1')).toHaveTextContent('task-1');
+	fireEvent.click(screen.getByRole('checkbox-task-0'));
+	fireEvent.click(screen.getByRole('CompletedTask'));
+	expect(screen.getByRole('task-0')).toHaveTextContent('task-0');
+	expect(screen.getByRole('list')).not.toHaveTextContent('task-0');
+
+	fireEvent.click(screen.getByRole('ClearCompletedTask'));
+	expect(screen.getByRole('list')).not.toHaveTextContent('task-0');
 });
